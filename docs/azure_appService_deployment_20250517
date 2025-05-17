@@ -1,0 +1,80 @@
+
+✅ Azure Spring Boot App Deployment via GitHub Actions – Structured Notes:-
+
+🔹 Step 1: Azure Setup (Resource Group & Web App)
+           1. Login to Azure Portal → https://portal.azure.com
+           2. Go to App Services → Click Create → Choose:
+           3. Resource Group Name: e.g., securityDev20250517
+           4. App Name: e.g., dev-security
+              ⮕ This becomes part of the public API URL: https://dev-security-xxxx.azurewebsites.net
+           5. Runtime Stack: Java 17
+           6. OS: Linux
+           7. Pricing Tier: Free (F1)
+
+🔹 Step 2: Link GitHub to Azure App Service
+           1. Go to Deployment Center in the created App Service
+           2. Source: Select GitHub
+           3. Organization: e.g., ritkrs
+           4. Repository: security_16052025
+           5. Branch: dev
+           6. Workflow option: Add a workflow file
+           7. Authentication: Use User-assigned identity (auto-managed)
+
+ 🔄 This step will auto-create a .yml workflow file in GitHub → .github/workflows/
+
+ 🤔 .yml file kyu banta hai? Aur manually kyun banaya?
+
+ 🔹 .yml kya hota hai?
+    1. Ye ek GitHub Actions ka workflow file hota hai.
+    2. Jab bhi aap GitHub repo me push karte ho, ye file batata hai ki kya-kya kaam karna hai.
+       1. Jaise: Build karna, test karna, deploy karna.
+
+ 🔹 Automatically kab banta hai?
+    1. Jab aap Azure portal ke Deployment Center se GitHub link karte ho,
+    2. Aur option select karte ho:
+       ✅ “Add a workflow file”
+    3. Tab Azure khud .yml file create kar deta hai repo ke andar:
+       .github/workflows/dev-dev-security.yml
+
+  🔹 Hume manually kyun banana/edit karna pada?
+     1. Azure ne file to banaya tha, lekin assume kar liya ki pom.xml project root me hai.
+     2. Lekin tumhare project ka actual path tha:
+         /security_16052025/security/pom.xml
+     3. Isiliye .yml me hume ye line add karni padi:
+        working-directory: ./security
+
+
+  🔹 Step 3: GitHub Actions Build + Deploy Flow (Hinglish Notes)
+             1. Whenever you commit or push to dev branch:
+             2. Workflow will trigger:
+                1. Build the project using mvn clean install
+                2. Package the JAR
+                3. Deploy to Azure App Service
+
+
+                ✅ Successful deploy will expose the endpoint on:
+                   https://<app-name>.azurewebsites.net/<your-controller-mapping>
+                   E.g:-  https://dev-security-xxxxx.centralindia-01.azurewebsites.net/test/api
+
+
+                   🎉 Deployment Confirmation
+                      1. Verify API in Postman or browser
+                      2. Status: ✅ 200 Ok
+                      3.  Response: Your controller response (e.g., "Details")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
