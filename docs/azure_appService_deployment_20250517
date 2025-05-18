@@ -1,5 +1,5 @@
 
-✅ Azure Spring Boot App Deployment via GitHub Actions – Structured Notes:-
+✅ Azure Spring Boot App Deployment via GitHub Actions(CICD) – Structured Notes:-
 
 🔹 Step 1: Azure Setup (Resource Group & Web App)
            1. Login to Azure Portal → https://portal.azure.com
