@@ -9,6 +9,6 @@ import org.springframework.web.bind.annotation.RestController;
 public class AnotherController {
     @GetMapping("/api")
     public  String getDetails(){
-        return "Another Controller-V2";
+        return "Another Controller-V3";
     }
 }
