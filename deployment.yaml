@@ -1,0 +1,25 @@
+
+#This file will be used for manual deployment on AKS - code-483
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aks20250527-deployment
+  labels:
+    app: aks20250527
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aks20250527
+  template:
+    metadata:
+      labels:
+        app: aks20250527
+    spec:
+      containers:
+        - name: aks20250527-container
+          image: 19ritkrs/aks20250527:v1
+          ports:
+            - containerPort: 8080
+

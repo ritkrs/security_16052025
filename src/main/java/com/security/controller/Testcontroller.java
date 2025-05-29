@@ -11,6 +11,6 @@ public class Testcontroller {
     @GetMapping("/api")
     public  String getDetails(){
 
-        return "Details+3rd commit testing+Version 2 ";
+        return "Details+3rd commit testing+Version 2 + AKS Deployment ";
     }
 }

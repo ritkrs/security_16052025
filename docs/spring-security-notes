@@ -2,3 +2,10 @@
 
 All Are working fine.
 2nd story is running fine.
+
+1. Spring boot Security Starter ka dependency add karte hi yeah ek password generate karta hai on console.
+2. Dependency add karne k baad agar koi api access karte hai to username and password mangta to access API'S.
+3. Default username hota hai user and password jo console p hota hai uske through API's access karte hai.
+
+4. agar properties files s username and password set kar dete hai to phir console p password generate nhi hota hai.
+5. Jo username and password properties file m hota hai usi s login ho jata hai.

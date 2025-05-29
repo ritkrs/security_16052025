@@ -1,0 +1,15 @@
+
+#This file will be used for manual deployment on AKS - code-483
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: aks20250527-service
+spec:
+  type: LoadBalancer
+  selector:
+    app: aks20250527
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080

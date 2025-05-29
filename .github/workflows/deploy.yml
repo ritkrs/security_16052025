@@ -1,0 +1,43 @@
+name: Build and Deploy to AKS
+
+on:
+  push:
+    branches:
+      - main  # or 'dev' depending on your branch name
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        run: echo "Mathura@123" | docker login -u "19ritkrs" --password-stdin
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t 19ritkrs/aks20250527:v1 .
+          docker push 19ritkrs/aks20250527:v1
+
+      - name: Set up Azure CLI
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Set AKS context
+        run: az aks get-credentials --name akscluster20250527 --resource-group aks20250527 --overwrite-existing
+
+      - name: Deploy to AKS
+        run: |
+          kubectl apply -f deployment.yaml
+          kubectl apply -f service.yaml
