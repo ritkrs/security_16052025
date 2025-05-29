@@ -3,7 +3,7 @@ name: Build and Deploy to AKS
 on:
   push:
     branches:
-      - main  # or 'dev' depending on your branch name
+      - dev  # or 'dev' depending on your branch name
 
 jobs:
   build-and-deploy:
