@@ -3,7 +3,7 @@ name: Build and Deploy to AKS
 on:
   push:
     branches:
-      - dev  # or 'dev' depending on your branch name
+      - dev
 
 jobs:
   build-and-deploy:
@@ -30,8 +30,12 @@ jobs:
 
       - name: Build and Push Docker Image
         run: |
-          docker build -t 19ritkrs/aks20250527:v1 .
-          docker push 19ritkrs/aks20250527:v1
+          docker build -t 19ritkrs/aks20250527:${{ github.run_number }} .
+          docker push 19ritkrs/aks20250527:${{ github.run_number }}
+
+      - name: Replace image tag in deployment.yaml
+        run: |
+          sed -i "s|{{IMAGE_TAG}}|${{ github.run_number }}|g" deployment.yaml
 
       - name: Set up Azure CLI
         uses: azure/login@v1

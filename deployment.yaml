@@ -1,4 +1,3 @@
-
 #This file will be used for manual deployment on AKS - code-483
 
 apiVersion: apps/v1
@@ -19,7 +18,6 @@ spec:
     spec:
       containers:
         - name: aks20250527-container
-          image: 19ritkrs/aks20250527:v1
+          image: 19ritkrs/aks20250527:{{IMAGE_TAG}}
           ports:
             - containerPort: 8080
-
