@@ -1,0 +1,396 @@
+
+1. login to Azure
+
+1️⃣ Login to Azure:-
+____________________________________________________________________________________________________________________________________________
+
+*1 login to azure portal-->profile-->Switch directory(Azure Active Directory)-->then pick Directory ID.
+    Directory Id:- Issi ko hi tenant kehte hai jiska use hamlog login karne m hota hai.
+
+*2  run this command from cmd:- az login --tenant jahjdhj123hhf (TenantID).
+    Verify login hua or nahi:- az account show
+
+*3 Create resource group now:- az group create --name aks20250527 --location centralindia
+    NOTE:- aks20250527:- yeah mera resource group ka name hoga.
+
+*4 Now verify ki create resource group bana or nahi.
+   1. Command:- az group show --name aks20250527 --output table
+   2. Verify from UI:- resource group search kar in search baar and dekho ki aks20250527 is name s koi resource group bana hai or nahi.
+      or directly resource group jo banaye ho(aks20250527) usko search baar m search karo.
+
+____________________________________________________________________________________________________________________________________________
+
+2️⃣ Now Create AKS Cluster:
+   Command:- az aks create --resource-group aks20250527 --name akscluster20250527 --node-count 1 --generate-ssh-keys
+
+    BELOW EXPLANATION OF COMMAND:-
+
+    1. az:-	Azure CLI ka base command
+    2. aks:-	Azure Kubernetes Service module (AKS se related commands)
+    3. create:-	Naya AKS cluster banane ke liye
+    4. --resource-group aks20250527:-	Jis resource group me cluster banana hai (yahan: aks20250527)
+    5. --name akscluster20250527:-	Cluster ka naam (jo aap rakh rahe ho: akscluster20250527)
+    6. --node-count 1:-	Kitne VM nodes hone chahiye cluster me (yahan 1 node)
+    7. --generate-ssh-keys:-  SSH ke liye automatic public/private keys generate karega
+
+6. Now,Verify ki cluster bana hai or nahi:-
+   Verify Command:- az aks get-credentials --resource-group aks20250527 --name akscluster20250527
+   Verify Nodes:- kubectl get nodes
+
+7. Now,Verify ki cluster bana hai or nahi from UI:-
+   1. Search → Kubernetes services--> Click on it --> Yahan aapko aapka cluster dikhega: akscluster20250527
+   2. Now search in left search bar as 'Node Pools' --> yaha p apko apke node ka sara status dikh jayega.
+
+******************************************************** - DOCKER THINGS - *****************************************************************
+
+DOCKER USERNAME:- 19ritkrs
+
+1. mvn clean package - Isse jar file banega.
+   NOTE:- jar bana ki nahi.root directory m ja kar yeah command chalao:- dir target\*.jar
+
+2. Project root m ek file banao with name of 'Dockerfile'
+3. Dockerfile file m below content dalo:-
+
+    FROM openjdk:17
+    COPY target/*.jar app.jar
+    ENTRYPOINT ["java", "-jar", "/app.jar"]
+
+4. Ab project root m ja kar docker k kuch command m run karna hai:-
+   project root m ho or nahi,yeah confirm karte hai pahle:-
+
+   1. Aap kaunse folder (directory) me ho:- pwd
+   2. agar root m ho to check ki Dockerfile hai or nahi by using this command:- dir target\*.jar
+
+3. Now,build Docker image:-
+   1. command:- docker build -t 19ritkrs/aks20250527:v1 .
+   2. Verify Command:- docker images
+
+4. Now PUSH Docker image to DOCKERHUB:-
+   1. command:- docker push 19ritkrs/aks20250527:v1
+   2. Verify:- Go to: https://hub.docker.com/repositories
+      Then,uske baad:- 19ritkrs/aks20250527 repo dikhega
+      Click karo 👉 19ritkrs/aks20250527
+      Open hone ke baad aapko Tags tab ya tag list directly dikhegi
+      agar Tag V1 hai to sab kuch perfect hai.
+
+____________________________________________________________________________________________________________________________________________________________
+
+3️⃣ Step 3: Create deployment.yaml to define your app ✅
+
+      NOTE:- Is deployment m jo file use hoga us file ka code hai 483
+
+   *1 Project root me right--click karo--> Select: New → File --> Name the file: deployment.yaml
+   *2 file banane k baad usme content dalo.content Docs folder s copy paste kar sakte ho.
+   *2 confirm ki deployment.yaml sahi jagah bana hai or nahi:- dir deployment.yaml
+   *3 Yaha tak sab kuch sahi to go ahead with next step.
+
+__________________________________________________________________________________________________________________________________________________
+
+4️⃣ Apply Deployment to AKS ✅
+
+   *1 Pahle check karo ki kubectl AKS cluster se connected hai ya nahi:
+   *2 Run this Command:- kubectl config current-context
+   *3 Agar connected hua to yeah cluster ka name dikhega as output.
+   *4 Agar connected nhi hua to yeah dikhega:- az aks get-credentials --resource-group aks20250527 --name akscluster20250527
+   *5 again run this:- kubectl config current-context
+
+   *6 Now:- Deploy App to AKS:-
+      Run Command:- kubectl apply -f deployment.yaml
+   *7 Agar yaha tak sahi to go ahead with next step.
+
+__________________________________________________________________________________________________________________________________________________
+
+
+5️⃣  Create service.yaml to expose your app ✅
+
+       NOTE:- Iss deployment m jo service use hoga uska code hai 483
+
+    *1 service.yaml — Create this file in the same project directory.
+    *2 file banane k baad usme content dalo.content Docs folder s copy paste kar sakte ho.
+    *3 Now run this:- kubectl apply -f service.yaml
+    *4 agar yeah output aa gya to sahi hai:- service/aks20250527-service created
+
+
+1. Check External IP of Your App:-
+   1. Run this:- kubectl get service aks20250527-service
+   2. iss command s tumhe external IP mil jayega.
+   3. Now make the url for api access like this:- http://40.81.255.239
+   4. External IP ka use kar k api ko access kar sakte ho.I mean api k baad api k endpoint de kar API access kar sakte ho.
+
+____________________________________________________________________________________________________________________________________________________
+
+
+
+
+CICD PIPELINE INTEGRATION:-
+_______________________________________
+
+1. GitHub Actions OIDC Integration with Azure(Open Id Connect):-
+
+   1 Purpose:- OpenID(OIDC) isley connect karte hain taki Github ko Azure me secure tarike se login karne diya jaye.
+               ** Bina username and password ya secrets ke - bas ek trusted identity k through.
+
+1. Go to the Azure Portal Home: https://portal.azure.com
+2. In the Search bar at the top, type: App registrations
+3. Click on the result that says App registrations under Services
+4. Now you’re on the App registrations page → Click on "+ New registration"
+5. Now you’re on the “Register an application” screen:-
+   *1 Fill in the following:
+      Name:- aks-gh-actions-app
+   *2 Supported account types:
+      Select::- Accounts in this organizational directory only (Default Directory only - Single tenant)
+   *3 Redirect URI (optional):- Leave it blank for now. (We don’t need it for GitHub Actions OIDC)
+
+✅ Step 3: Create a Client Secret:-
+   ** Now we’ll generate a client secret for this app.
+
+   *1 In the left-hand menu under your app, click on "Certificates & secrets".
+   *2 Under the "Client secrets" section, click “+ New client secret”.
+   *3 Fill:-
+      *1 Description:-  You can write gh-actions-secret
+      *2 Expires: Choose 6 months or 12 months as per your policy.
+      *3 Click “Add”
+   *4 ⚠️ Copy the value of the secret immediately. You won’t see it again later. Keep it safe for now.
+
+      6bc418ba-c0fd-401b-8374-ffbfc212af0a
+
+✅ Step 4: Get Required Azure Credentials for GitHub Secret
+
+   ** Now we’ll collect all the credentials that GitHub needs to log in to Azure via the workflow.
+      You need to note down the following 4 details:
+
+      1. Subscription ID  2. Tenant ID  3. Client ID (Application ID)  4. Client Secret (from previous step)
+
+   *1 Subscription ID:-
+      *1 From Azure Portal homepage --> Search and go to "Subscriptions"  -->  Open your active subscription  --> Copy the Subscription ID
+
+61de3f12-73d3-4f86-ae76-cd7e94e6de86
+
+
+   *2 Tenant ID:-
+      *1 Azure portal home pe jao --> Search karo: "Azure Active Directory" --> Open karo → Overview tab → Wahan Tenant ID clearly dikh jayega ✅
+         13318b29-4236-41c7-a64b-ae1cc92c138f
+
+   *3 Client ID (Application ID):-
+      *1 Search for App Registration → All Applications tab --> look for App registration name which you created in first step --> copy client ID
+
+   *4 You should have copied it when you created it in Step 3
+
+   *4 Client Secret (from previous step):-
+      *1 You should copy from step 3.if forget follow step no 3 once again and generate it.
+
+
+✅ Step 5: GitHub Secret Setup for Azure Login (GitHub Actions)
+
+   PURPOSE:- Azure app ko GitHub se securely connect karna hai taaki automatic deployment ho sake.
+
+*1 Apne GitHub repo pe jao
+   Example: ritkrs/security_16052025
+
+*2 Navigate karo:
+   Settings → Secrets and variables → Actions
+
+3. Click karo:
+   “New repository secret”
+
+4. Yeh details fill karo:
+   Name:- AZURE_CREDENTIALS
+   Value:- (yeh pura JSON paste karo jo upar wala steps s retrieve kiye ho):-
+   {
+     "clientId": "b6c39a1f-294d-4b07-a774-052bb1be5bfb",
+     "clientSecret": "6bc418ba-c0fd-401b-8374-ffbfc212af0a",
+     "subscriptionId": "61de3f12-73d3-4f86-ae76-cd7e94e6de86",
+     "tenantId": "13318b29-4236-41c7-a64b-ae1cc92c138f"
+   }
+
+ 5. “Add secret” pe click kar do.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+*1 Yaha tak sab kuch manually kar rahe the. I mean sab kuch automate karne k
+   lye ab niche ka process apply karna padega.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+   Tomorrow:- commands:- Check pods name and by using pods name see the log.
+
+                         APIM
+                         App Service deployment
+                         location-master project study
+                         Security
+                         OpenID Connect
+
+
+                         pipeline:- Isko banane k lye ek file banan hota hai
+                         with name of deploy.yml in workflow directory of
+                          springboot project.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
